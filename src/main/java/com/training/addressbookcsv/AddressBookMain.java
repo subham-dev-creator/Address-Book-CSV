@@ -1,5 +1,6 @@
 package com.training.addressbookcsv;
 
+import com.google.gson.Gson;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -8,9 +9,7 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,6 +23,7 @@ public class AddressBookMain {
 
     private static String path = "C:\\Users\\I524735\\IdeaProjects\\AddressBook-System";
     private static String directory = "Address Book Directory";
+    private  static String Json_directory = "Address Book Json Directory";
 
     private static void deleteContact() {
         System.out.println(addressBookMap.keySet());
@@ -276,6 +276,46 @@ public class AddressBookMain {
 
     }
 
+    private static void readFromAJSON() throws IOException {
+        Path pathLocJsonread = Paths.get(path + "\\addressbook\\" + Json_directory);
+        if (Files.notExists(pathLocJsonread))
+            Files.createDirectory(pathLocJsonread);
+
+        String SAMPLE_JSON_FILE1 = path + "\\addressbook\\" + Json_directory + "\\file_json"
+                +".json";
+        Gson gson1 = new Gson();
+
+        BufferedReader br = new BufferedReader(new FileReader(SAMPLE_JSON_FILE1));
+        AddressBook[] contact = gson1.fromJson(br, AddressBook[].class);
+        List<AddressBook> contactList = Arrays.asList(contact);
+        for (AddressBook a : contactList) {
+            System.out.println("Firstname : " + a.firstName);
+            System.out.println("Lastname : " + a.lastName);
+            System.out.println("City : " + a.city);
+            System.out.println("State : " + a.state);
+            System.out.println("Zip : " + a.zip);
+            System.out.println("Phone number : " + a.phoneNum);
+            System.out.println("Email : " + a.email);
+            System.out.println("**********************************");
+        }
+    }
+
+    private static void writeToAJSON() throws IOException {
+        System.out.println("Enter the name of the address book to add to csv file");
+        ArrayList<AddressBook> listGson = addressBookMap.get(sc.next());
+        Path pathLocJson = Paths.get(path + "\\addressbook\\" + Json_directory);
+        if (Files.notExists(pathLocJson))
+            Files.createDirectory(pathLocJson);
+
+        String SAMPLE_JSON_FILE = path + "\\eclipse-workspace\\AddressBookLib\\" + Json_directory + "\\Json directory"
+                + ".json";
+        Gson gson = new Gson();
+        String json = gson.toJson(listGson);
+        FileWriter writer = new FileWriter(SAMPLE_JSON_FILE);
+        writer.write(json);
+        writer.close();
+    }
+
     public static void main(String[] args) throws IOException {
         System.out.println("Welcome to Address Book");
         int choice = 1;
@@ -288,7 +328,7 @@ public class AddressBookMain {
                     "12.View Alphabetically sorted contacts in a particular address book by State " +
                     "\n13.View Alphabetically sorted contacts in a particular address book by Zip " +
                     "\n14.Write To a File \n15.Read From a File \n16.Write to CSV \n17.Read From CSV " +
-                    "\n0 to exit");
+                    "\n18.Write to a JSON \n19.Read From a JSON0 to exit");
             choice = sc.nextInt();
             switch(choice) {
                 case 1 :
@@ -341,7 +381,13 @@ public class AddressBookMain {
                 case 17:
                     readFromACSV();
                     break;
-                
+                case 18:
+                    writeToAJSON();
+                    break;
+                case 19:
+                    readFromAJSON();
+                    break;
+
                 default :
                     System.out.println("Invalid Input ");
                     break;
