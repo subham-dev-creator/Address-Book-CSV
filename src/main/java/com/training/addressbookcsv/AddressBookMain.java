@@ -287,7 +287,8 @@ public class AddressBookMain {
                     "\n 11.View Alphabetically sorted contacts in a particular address book by city \n" +
                     "12.View Alphabetically sorted contacts in a particular address book by State " +
                     "\n13.View Alphabetically sorted contacts in a particular address book by Zip " +
-                    "\n14.Write To a File \n15.Read From a File \n0 to exit");
+                    "\n14.Write To a File \n15.Read From a File \n16.Write to CSV \n17.Read From CSV " +
+                    "\n0 to exit");
             choice = sc.nextInt();
             switch(choice) {
                 case 1 :
@@ -340,6 +341,7 @@ public class AddressBookMain {
                 case 17:
                     readFromACSV();
                     break;
+                
                 default :
                     System.out.println("Invalid Input ");
                     break;
