@@ -1,6 +1,16 @@
 package com.training.addressbookcsv;
 
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -215,6 +225,57 @@ public class AddressBookMain {
         }
     }
 
+    public static void writeToACSV() throws IOException {
+        System.out.println("Enter the name of the address book to add to csv file");
+        ArrayList<AddressBook> listCsv = addressBookMap.get(sc.next());
+        Path directoryLoc2 = Paths.get(path + "\\csvFile\\" + directory);
+        if (Files.notExists(directoryLoc2)) {
+            Files.createDirectory(directoryLoc2);
+        }
+
+        Path fileLoc2 = Paths.get(directoryLoc2 + "\\File" + ".csv");
+        if (Files.notExists(fileLoc2))
+            Files.createFile(fileLoc2);
+
+        try (Writer writer = Files.newBufferedWriter(Paths.get(fileLoc2.toUri()));) {
+            StatefulBeanToCsv<ArrayList<AddressBook>> beanToCsv = new StatefulBeanToCsvBuilder(writer)
+                    .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).build();
+
+            try {
+                beanToCsv.write(addressBookMap.get(listCsv));
+            } catch (CsvDataTypeMismatchException e) {
+                e.printStackTrace();
+            } catch (CsvRequiredFieldEmptyException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void readFromACSV() throws IOException {
+        Path pathLoc = Paths.get(path + "\\addressbook\\" + directory);
+        Path fileLoc11 = Paths.get(pathLoc + "\\File" + ".csv");
+        try (Reader reader = Files.newBufferedReader(Paths.get(fileLoc11.toUri()));) {
+
+            CsvToBean<AddressBook> csvToBean = new CsvToBeanBuilder(reader)
+                    .withType(AddressBook.class).withIgnoreLeadingWhiteSpace(true).build();
+
+            Iterator<AddressBook> AddressBookIterator = csvToBean.iterator();
+
+            while (AddressBookIterator.hasNext()) {
+                AddressBook contact = AddressBookIterator.next();
+                System.out.println("Firstname : " + contact.firstName);
+                System.out.println("Lastname : " + contact.lastName);
+                System.out.println("City : " + contact.city);
+                System.out.println("State : " + contact.state);
+                System.out.println("Zip : " + contact.zip);
+                System.out.println("Phone number : " + contact.phoneNum);
+                System.out.println("Email : " + contact.email);
+                System.out.println("**********************************");
+            }
+        }
+
+    }
+
     public static void main(String[] args) throws IOException {
         System.out.println("Welcome to Address Book");
         int choice = 1;
@@ -273,10 +334,17 @@ public class AddressBookMain {
                 case 15:
                     readFromAFile();;
                     break;
+                case 16:
+                    writeToACSV();
+                    break;
+                case 17:
+                    readFromACSV();
+                    break;
                 default :
                     System.out.println("Invalid Input ");
                     break;
             }
         }
     }
+
 }
